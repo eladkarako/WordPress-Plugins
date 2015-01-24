@@ -11,24 +11,13 @@
    * License:            GPL2
    */
 
+
   if (!is_admin()) {
-
-
-    add_action('template_redirect', function () {
-      @ob_start(function ($buffer) {
-        return raw_html_process($buffer);
-      });
-    }, -9999999);
-
-    add_action('shutdown', function () {
-      while (ob_get_level() > 0)
-        @ob_flush_end();
-    }, 9999999);
 
 
     require_once('functions.php');
 
-    function raw_html_process($html) {
+    hook_html(function ($html) {
 
       $html = put_all_scripts_at_end($html); //example for a function that modifies the raw HTML. ---- please add more...
 
@@ -37,7 +26,10 @@
        *******************************/
 
       return $html;
-    }
+    });
+
+
   }
+
 
 ?>
