@@ -77,11 +77,14 @@ but you are the "server-side" "last one", so, enjoy!
   * Compatible with every browser version.
 
 == Changelog ==
+**1.3.6.5.2**
+minor code design-pattern and distribution.
+
 **1.3.6.5**
-fixing flow issues
+fixing flow issues.
 
 **1.3.6.1**
-fixing path related issues
+fixing path related issues.
 
 **1.3.5**
-First release
+First release.
