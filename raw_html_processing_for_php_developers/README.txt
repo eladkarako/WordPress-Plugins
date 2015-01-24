@@ -77,6 +77,9 @@ but you are the "server-side" "last one", so, enjoy!
   * Compatible with every browser version.
 
 == Changelog ==
+**1.3.6.5**
+fixing flow issues
+
 **1.3.6.1**
 fixing path related issues
 

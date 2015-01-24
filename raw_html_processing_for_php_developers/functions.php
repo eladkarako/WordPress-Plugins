@@ -1,6 +1,4 @@
 <?php
-
-
   /**
    * quickly cut all script tags and paste them before the end-body tag.
    *
