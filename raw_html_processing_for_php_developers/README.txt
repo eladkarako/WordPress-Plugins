@@ -17,7 +17,7 @@ this plugin, <small>is actually a small framework</small>, that allows you to ed
 
 the name of the plugin is 'Raw HTML Processing For PHP Developers' because you have a very easy, very clean access to the end-point of the HTML buffer, and as a developer you may add remove or modify - the HTML string, and returning the result.
 
-No WordPress-API knowledge is required, you can do basic or advanced string-manipulation, and look around the HTML modifying it in a much lower level then provided by WordPress.
+No WordPress-API knowledge is required, you can do basic or advanced string-manipulation, and look around the HTML modifying it in a much lower level than provided by WordPress.
 
 *   removing tags.
 *   modify information above the head, html or after the body tag end (essentially everywhere).
@@ -60,8 +60,7 @@ this way I'm giving you a wrapping around a very efficient way of HTML modifying
 Well...
 
 there are rewrite rules of Apache (or nginx, or even NodeJS), stuff you'll be adding your <code>.htaccess</code> might have effect,
-
-and then there is <code>JavaScript</code> which renderes your page at the very end into a <code>Document-Object-Model</code>,
+and.. there is <code>JavaScript</code> which renderes your page at the very end into a <code>Document-Object-Model</code>,
 
 so.. no you are not the definitive "last one", 
 but you are the "server-side" "last one", so, enjoy!
@@ -78,5 +77,8 @@ but you are the "server-side" "last one", so, enjoy!
   * Compatible with every browser version.
 
 == Changelog ==
-**1.5.3**
+**1.3.6.1**
+fixing path related issues
+
+**1.3.5**
 First release
