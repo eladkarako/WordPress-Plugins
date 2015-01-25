@@ -1,4 +1,4 @@
-=== Raw HTML Processing For PHP Developers ===
+=== WordPress Raw HTML Processing For PHP Developers ===
 Contributors: eladkarako 
 Donate link:https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=7994YX29444PA
 Tags: raw,html,modify,string,manipulation,buffer,php,async,js,headjs,asynchronous,javascript,css,perfor,api,framework,easy,wordpress,developer
