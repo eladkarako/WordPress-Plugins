@@ -7,7 +7,7 @@ Tested up to: 4.1
 Stable tag: trunk
 License: GPLv2 or later
 
-Manipulate your blog's raw HTML. Framework, no WordPress-API knowledge required, just good-old PHP.
+A WordPress Plugin (or a framework) to help you manipulate your blog's raw HTML, as string. No WordPress-API knowledge required, just good-old PHP skills.
 
 == Description ==
 
@@ -77,6 +77,9 @@ but you are the "server-side" "last one", so, enjoy!
   * Compatible with every browser version.
 
 == Changelog ==
+**3.1.5**
+code fix, logic enhancement, simplifying the implementation of the hooks. adding more html-modifiers. optionally adding information at the bottom of the page.
+
 **1.3.6.5.2**
 minor code design-pattern and distribution.
 
