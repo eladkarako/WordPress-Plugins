@@ -82,7 +82,6 @@ you can activate through .htaccess some minifications, try it:
    ModPagespeedEnableFilters collapse_whitespace
 </IfModule>
 
-
 == Screenshots ==
 1. An unmodified HTML (Sample)
 2. A modified HTML, the included example runs raw-html string modification to move all the <code>script</code> tags to the end of the body tag [both inline and external resources].
