@@ -117,7 +117,12 @@
    */
   function collapse_white_space_between_tags($html) {
 
-    $html = preg_replace("/>\s+</s", "> <", $html);
+    $replacements = [
+      "/>\n+</s"   => "><" //separation by new line can be omitted
+      , "/>\s+</s" => "> <"//separation by whitespace can not be omitted since it will change the line-breaks shown on the page.
+    ];
+
+    $html = preg_replace(array_keys($replacements), array_values($replacements), $html);
 
     return $html;
   }
@@ -154,6 +159,12 @@
 
       return $tag_start . $inline . '</script>'; //reassemble
     }, $html);
+
+    return $html;
+  }
+
+  function remove_type_text_javascript_in_script_tags($html) {
+    $html = preg_replace("#type\=[\',\"]?text\/javascript[\',\"]?#msi", '', $html);
 
     return $html;
   }

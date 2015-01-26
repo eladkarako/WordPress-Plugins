@@ -79,29 +79,13 @@
    * @return string
    */
   function minify_javascript($javascript = '') {
-
-//    /**
-//     * comments-remover
-//     */
-//    $javascript = call_user_func_array(function ($javascript) {
-//      $enhancements = ["#\/\*[\w\'\s\r\n\*]*\*\/#ims"        => '',  //   enhancement #1: /* */ remover
-//                       "#\/\/[\w\s\']*$#ims"                 => '',  //   enhancement #2: // remover
-//                       "#(<![CDATA[([^]]|(]+[^>]))*]+>)#ims" => ''];  //  enhancement #3: /* <![CDATA[ */   /* ]]> */
-//
-//      return preg_replace(array_keys($enhancements), array_values($enhancements), $javascript);
-//    }, [$javascript]);
-
-
-    /**
-     * provide simple enhancements that might save some space.
-     */
-    $javascript = call_user_func_array(function ($javascript) {
-      $enhancements = ["/;{2,}/sm"         => ';',  //   enhancement #1: semicolon duplication to single semicolon.
-                       "/;}/sm"            => '}',  //   enhancement #2: last-semicolon before closing-curly-bracket is not needed.
-                       "/;(\s*\n*\s*)+/sm" => ';'];  //   enhancement #3: whitespace after last-semicolon can be omitted.
-
-      return preg_replace(array_keys($enhancements), array_values($enhancements), $javascript);
-    }, [$javascript]);
+    $javascript = str_replace('/**/', '', $javascript);
+    $javascript = str_replace("\r", "\n", $javascript);
+    $javascript = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $javascript); // remove comments
+    $javascript = str_replace(["\r\n", "\r", "\n", "\t", 'Â  ', 'Â Â Â  ', 'Â Â Â  '], '', $javascript);// remove tabs, spaces, newlines, etc.
+    $javascript = preg_replace("/\/\/.*$[\r\n]*/m", '', $javascript); // remove comments
+    $javascript = preg_replace("/\/\*.*?\*\//s", '', $javascript); // remove comments
+    $javascript .= PHP_EOL;
 
 
     return $javascript;
@@ -185,12 +169,10 @@
    *
    * @param string $html_before - the raw HTML
    * @param string $html_after  - any state HTML (preferably, at final state..)
-   * @param string $mode        - delta-information shown as "bytes" or "chars" or "all" (for both).
    *
    * @return string             - HTML comment you can place at the end of the HTML (for example).
    */
-  function get_delta_information($html_before, $html_after, $mode = "bytes") {
-    $mode = ("bytes" === $mode || "chars" === $mode || "all" === $mode) ? $mode : "all";
+  function get_delta_information($html_before, $html_after) {
 
     $length_chars_before = mb_strlen($html_before);
     $length_bytes_before = mb_strlen($html_before, '8bit');
@@ -221,7 +203,7 @@
     //--
 
     $output = base64_decode("CjwhLS0gV29yZFByZXNzIFJhdy1IVE1MLVByb2Nlc3NpbmcgRnJhbWV3b3JrIEZvciBQSFAtRGV2ZWxvcGVycyAvRWxhZCBLYXJha28gKDIwMTUpICAK");
-    $output .= json_encode($results, JSON_PRETTY_PRINT);
+    $output .= json_encode($results);//, JSON_PRETTY_PRINT);
     $output .= "\n-->\n";
 
     return $output;

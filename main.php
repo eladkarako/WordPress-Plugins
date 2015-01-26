@@ -18,12 +18,13 @@
   hook_html(function ($html) {
     $html_before = $html; //optional - only required for measurements (using "get_delta_information" function)
 
-    $html = put_all_link_css_at_end_of_head($html);  //             Google PageSpeed "best practices"
-    $html = put_all_scripts_at_end_of_body($html);  //              Google PageSpeed "best practices"
-    $html = collapse_multiple_line_feed($html);  //                 saves about 2%
-    $html = collapse_white_space_between_tags($html);  //           saves about 5-8%
     $html = minify_all_inner_css_in_style_tags($html);  //          saves about 2%
     $html = minify_all_inner_javascript_in_script_tags($html);  //  saves about 4%
+    $html = remove_type_text_javascript_in_script_tags($html);  //  saves about 4%
+    $html = collapse_multiple_line_feed($html);  //                 saves about 2%
+    $html = collapse_white_space_between_tags($html);  //           saves about 5-8%
+    $html = put_all_link_css_at_end_of_head($html);  //             Google PageSpeed "best practices"
+    $html = put_all_scripts_at_end_of_body($html);  //              Google PageSpeed "best practices"
 
 
     /*******************************
