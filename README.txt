@@ -65,6 +65,23 @@ and.. there is <code>JavaScript</code> which renderes your page at the very end 
 so.. no you are not the definitive "last one", 
 but you are the "server-side" "last one", so, enjoy!
 
+**notes about simple Google PageSpeed**
+you can activate through .htaccess some minifications, try it:
+
+# BEGIN Google-Page-SpeedWordPress
+<IfModule pagespeed_module>
+   #default
+   ModPagespeed on
+   ModPagespeedEnableFilters extend_cache
+
+   #https://developers.google.com/speed/pagespeed/module/filter-comment-remove
+   ModPagespeedEnableFilters remove_comments
+   ModPagespeedRetainComment " WordPress Raw-HTML-Processing*"
+
+   #https://developers.google.com/speed/pagespeed/module/filter-whitespace-collapse
+   ModPagespeedEnableFilters collapse_whitespace
+</IfModule>
+
 
 == Screenshots ==
 1. An unmodified HTML (Sample)

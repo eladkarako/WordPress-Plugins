@@ -117,7 +117,7 @@
    */
   function collapse_white_space_between_tags($html) {
 
-    $html = preg_replace("/>\s+</s", "><", $html);
+    $html = preg_replace("/>\s+</s", "> <", $html);
 
     return $html;
   }
