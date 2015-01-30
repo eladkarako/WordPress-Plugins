@@ -210,4 +210,79 @@
 
   }
 
+  // o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o
+  // 0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0O0o0
+  // O0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0oO0
+
+  /**
+   * those two function solved a very pesky problem,
+   * <pre> and <code> tags may include a text that looks like HTML, JavaScript or other "target for modification",
+   * to prevent modification from "finding it valid for modification", I'm keeping the original-content, plain-sight,
+   * (even compress it to save space), the last step (before returning the HTML) is to reverse the protection,
+   *
+   * @original_idea_and_implementation: Elad Karako (eladkarako@gmail.com) ;)
+   */
+
+
+  /**
+   * the content of the pre-tags and code-tags should be intact,
+   * run "protect_pre_and_code_tags_content_from_change" before each starting to modify,
+   * and "unprotect_pre_and_code_tags_content_from_change" after you've done modifying the HTML.
+   *
+   * @param $html
+   *
+   * @return mixed
+   */
+  function protect_specific_tags_from_modifications($html) {
+    $tags_to_protect = [
+      'pre'        => '_p_r_e_'
+      , 'code'     => '_c_o_d_e_'
+      , 'textarea' => '_t_e_x_t_a_r_e_a_'
+    ];
+
+    foreach ($tags_to_protect as $tag => $protected_tag) {
+      $html = preg_replace_callback("#<" . $tag . "(.*?)>(.*?)</" . $tag . ">#is", function ($arr) use ($tag, $protected_tag) {
+        if (!isset($arr[0])) //no found: no add, no delete
+          return;
+
+        $full = $arr[0];
+
+        return '<' . $protected_tag . '>' . base64_encode(gzcompress($full)) . '</' . $protected_tag . '>'; //                      clean from HTML.
+      }, $html);
+    }
+
+    return $html;
+  }
+
+  /**
+   * returning the pre-tags and code-tags original unmodified content, run this after
+   * "protect_pre_and_code_tags_content_from_change" and all the HTML-modifying (last before returning the HTML).
+   *
+   * @param $html
+   *
+   * @return mixed
+   */
+  function unprotect_pre_and_code_tags_content_from_change($html) {
+    $tags_to_unprotect = [
+      '_p_r_e_'
+      , '_c_o_d_e_'
+      , '_t_e_x_t_a_r_e_a_'
+    ];
+
+
+    foreach ($tags_to_unprotect as $index => $tag) {
+      $html = preg_replace_callback("#<" . $tag . ">(.*?)</" . $tag . ">#is", function ($arr) use ($tag) {
+        if (!isset($arr[0])) //no found: no add, no delete
+          return;
+
+//        $full = $arr[0];
+        $inline = $arr[1];
+
+        return gzuncompress(base64_decode($inline)); //                      clean from HTML.
+      }, $html);
+    }
+
+    return $html;
+  }
+
 ?>

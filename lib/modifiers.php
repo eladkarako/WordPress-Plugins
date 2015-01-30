@@ -5,7 +5,6 @@
    * if you need to- break a long function into few assistance-functions and place them in the assist.php file.
    */
 
-
   /**
    * quickly cut all script tags and paste them before the end-body tag.
    *
@@ -99,27 +98,13 @@
    *
    * @return string
    */
-  function collapse_double_line_feed($html) {
-
-    $html = preg_replace("#\n{2,}#is", "\n", $html);
-
-    return $html;
-  }
-
-
-  /**
-   * make multiple \n collapse to one
-   * remmember that this might effect also stuff like code in pre-tags or code-tags but thats minor change..
-   *
-   * @param string $html
-   *
-   * @return string
-   */
   function collapse_white_space_between_tags($html) {
 
     $replacements = [
-      "/>\n+</s"   => "><" //separation by new line can be omitted
-      , "/>\s+</s" => "> <"//separation by whitespace can not be omitted since it will change the line-breaks shown on the page.
+      "/>\r+</s"         => ">\n<" //separation by new line can be omitted
+      , "/>\n+</s"       => "><" //separation by new line can be omitted
+      , "/>(\n+\s*)+</s" => "> <" //separation by new line can be omitted
+      , "/>(\s+\n*)+</s" => "> <"//separation by whitespace can not be omitted since it will change the line-breaks shown on the page.
     ];
 
     $html = preg_replace(array_keys($replacements), array_values($replacements), $html);

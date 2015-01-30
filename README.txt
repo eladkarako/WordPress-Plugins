@@ -66,7 +66,7 @@ so.. no you are not the definitive "last one", 
 but you are the "server-side" "last one", so, enjoy!
 
 **notes about simple Google PageSpeed**
-you can activate through .htaccess some minifications, try it:
+in addition you can activate through .htaccess some minifications, that (naturally) works after the PHP output has modified, try it:
 
 # BEGIN Google-Page-SpeedWordPress
 <IfModule pagespeed_module>
@@ -76,11 +76,13 @@ you can activate through .htaccess some minifications, try it:
 
    #https://developers.google.com/speed/pagespeed/module/filter-comment-remove
    ModPagespeedEnableFilters remove_comments
+   ModPagespeedRetainComment " _*"
    ModPagespeedRetainComment " WordPress Raw-HTML-Processing*"
 
    #https://developers.google.com/speed/pagespeed/module/filter-whitespace-collapse
    ModPagespeedEnableFilters collapse_whitespace
 </IfModule>
+# END Google-Page-SpeedWordPress
 
 == Screenshots ==
 1. An unmodified HTML (Sample)
@@ -93,6 +95,9 @@ you can activate through .htaccess some minifications, try it:
   * Compatible with every browser version.
 
 == Changelog ==
+**3.1.5.2**
+protect pre, code, textarea content before start modifying the HTML, so their content will remain, the original unmodified one (even if contains HTML, JavaSctipt, \n, etc...)
+
 **3.1.5**
 code fix, logic enhancement, simplifying the implementation of the hooks. adding more html-modifiers. optionally adding information at the bottom of the page.
 
