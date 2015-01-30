@@ -99,15 +99,41 @@
    * @return string
    */
   function collapse_white_space_between_tags($html) {
-
     $replacements = [
-      "/>\r+</s"         => ">\n<" //separation by new line can be omitted
-      , "/>\n+</s"       => "><" //separation by new line can be omitted
-      , "/>(\n+\s*)+</s" => "> <" //separation by new line can be omitted
-      , "/>(\s+\n*)+</s" => "> <"//separation by whitespace can not be omitted since it will change the line-breaks shown on the page.
+      "/>\n+</s"   => "><" //separation by new line can be omitted
+      , "/>\s+</s" => "> <"//separation by whitespace can not be omitted since it will change the line-breaks shown on the page.
     ];
 
     $html = preg_replace(array_keys($replacements), array_values($replacements), $html);
+
+    return $html;
+  }
+
+
+  /**
+   * remove self closing tag ending and collapse whitespace
+   *
+   * @param string $html
+   *
+   * @return string
+   */
+  function remove_self_end_tag_and_collapse_whitespace($html) {
+    $html = preg_replace("/\s*\/\>/smi", ">", $html);
+
+    return $html;
+  }
+
+
+  /**
+   * remove \n after <br>
+   *
+   * @param string $html
+   *
+   * @return string
+   */
+  function remove_line_feed_after_br_tag_and_hr_tag($html) {
+    $html = preg_replace("/<br\s*\/?>\n+/smi", "<br>", $html);
+    $html = preg_replace("/<hr\s*\/?>\n+/smi", "<hr>", $html);
 
     return $html;
   }
