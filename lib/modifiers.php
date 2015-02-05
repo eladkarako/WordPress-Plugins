@@ -108,11 +108,11 @@
 
     //#2
     //   - cases where its ok to remove the whitespace anyway (specific tags)
-    $tags = ['li', 'script', 'iframe', 'div', 'meta', '!--' /*--- this is for a comment tag meaning: "<!--" */];
+    $tags = ['li', 'script', 'iframe', 'div', 'title', 'br', 'pre', 'center', 'meta', '!--' /*--- this is for a comment tag meaning: "<!--" */];
     foreach ($tags as $tag) {
-      $replacements[ '#\s*\/' . $tag . '\>[^\<]*\<' . $tag . '#s' ] = '/' . $tag . '><' . $tag;
-      $replacements[ '#\s*\</' . $tag . '\>#s' ] = '</' . $tag . '>';
-      $replacements[ '#\>\s*\<' . $tag . '#s' ] = '><' . $tag;
+//      $replacements[ '#\s*\/' . $tag . '\>[^\<]*\<' . $tag . '#s' ] = '/' . $tag . '><' . $tag;
+//      $replacements[ '#\s*\</' . $tag . '\>#s' ] = '</' . $tag . '>';
+//      $replacements[ '#\>\s*\<' . $tag . '#s' ] = '><' . $tag;
     }
 
     $html = preg_replace(array_keys($replacements), array_values($replacements), $html);
@@ -210,8 +210,9 @@
 
 
   /**
-   * make sure meta tags are unique, link tags are unique, script tags are unique,
+   * make sure meta tags are unique, link tags are unique,
    * collapse duplicates (at any place in the HTML, not have to be near each-other).
+   * - it not handle script tags because of jQuery image-lazy-loading lags.
    *
    * @param  string $html - input HTML.
    *
@@ -219,15 +220,14 @@
    */
   function unify_duplicated_tags($html) {
     $tags = [
-      'meta'     => 'content'
-      , 'link'   => 'href'
-      , 'script' => 'src'
+      'meta'   => 'content'
+      , 'link' => 'href'
     ];
 
     foreach ($tags as $tag => $attribute) {
       $unique = [];
 
-      $html = preg_replace_callback("#<" . $tag . "[^\>]*?" . $attribute . "\s*=\s*(\'[^\']*\'|\"[^\"]*\"|[^\s]*?)[^\>]*?>" . "([^\<]*?<\/" . $tag . ">){0,1}" . "#is", function ($arr) use (&$sources, &$unique) {
+      $html = preg_replace_callback("#<" . $tag . "[^\>]*?" . $attribute . "\s*=\s*(\'[^\']*\'|\"[^\"]*\"|[^\s]*?)[^\>]*?>#is", function ($arr) use (&$sources, &$unique) {
         $full = $arr[0];
         $attribute_content = $arr[0];
 
