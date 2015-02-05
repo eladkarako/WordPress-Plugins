@@ -99,10 +99,21 @@
    * @return string
    */
   function collapse_white_space_between_tags($html) {
+    //#1
+    //   - most cases where presentation does not suffer, when whitespace collapsing
     $replacements = [
       "/>\n+</s"   => "><" //separation by new line can be omitted
       , "/>\s+</s" => "> <"//separation by whitespace can not be omitted since it will change the line-breaks shown on the page.
     ];
+
+    //#2
+    //   - cases where its ok to remove the whitespace anyway (specific tags)
+    $tags = ['li', 'script', 'iframe', 'div', 'meta', '!--' /*--- this is for a comment tag meaning: "<!--" */];
+    foreach ($tags as $tag) {
+      $replacements[ '#\s*\/' . $tag . '\>[^\<]*\<' . $tag . '#s' ] = '/' . $tag . '><' . $tag;
+      $replacements[ '#\s*\</' . $tag . '\>#s' ] = '</' . $tag . '>';
+      $replacements[ '#\>\s*\<' . $tag . '#s' ] = '><' . $tag;
+    }
 
     $html = preg_replace(array_keys($replacements), array_values($replacements), $html);
 
@@ -138,7 +149,11 @@
     return $html;
   }
 
-
+  /**
+   * @param $html
+   *
+   * @return string
+   */
   function minify_all_inner_css_in_style_tags($html) {
 
     $html = preg_replace_callback("/(<style[^\>]*?type=[\',\"]?text\/css[\',\"]?[^\>]*?\>)([^\<]*?)\<\/style\>/msi", function ($arr) {
@@ -157,6 +172,12 @@
     return $html;
   }
 
+
+  /**
+   * @param string $html
+   *
+   * @return string
+   */
   function minify_all_inner_javascript_in_script_tags($html) {
     $html = preg_replace_callback("/(<script[^\>]*?type=[\',\"]?text\/javascript[\',\"]?[^\>]*?\>)([^\<]*?)\<\/script\>/msi", function ($arr) {
       if (!array_key_exists(0, $arr) || !array_key_exists(1, $arr) || !array_key_exists(2, $arr)) //not found
@@ -174,8 +195,58 @@
     return $html;
   }
 
+  /**
+   * script tags types "text/javascript", can be omitted
+   *
+   * @param string $html
+   *
+   * @return string
+   */
   function remove_type_text_javascript_in_script_tags($html) {
     $html = preg_replace("#type\=[\',\"]?text\/javascript[\',\"]?#msi", '', $html);
+
+    return $html;
+  }
+
+
+  /**
+   * make sure meta tags are unique, link tags are unique, script tags are unique,
+   * collapse duplicates (at any place in the HTML, not have to be near each-other).
+   *
+   * @param  string $html - input HTML.
+   *
+   * @return string       - output HTML, after processing.
+   */
+  function unify_duplicated_tags($html) {
+    $tags = [
+      'meta'     => 'content'
+      , 'link'   => 'href'
+      , 'script' => 'src'
+    ];
+
+    foreach ($tags as $tag => $attribute) {
+      $unique = [];
+
+      $html = preg_replace_callback("#<" . $tag . "[^\>]*?" . $attribute . "\s*=\s*(\'[^\']*\'|\"[^\"]*\"|[^\s]*?)[^\>]*?>" . "([^\<]*?<\/" . $tag . ">){0,1}" . "#is", function ($arr) use (&$sources, &$unique) {
+        $full = $arr[0];
+        $attribute_content = $arr[0];
+
+        //remove \' \" wrapping (if any)
+        $attribute_content = preg_replace(["#^\'([^\']*?)\'$#s", "#^\"([^\"]*?)\"$#s"], ["\\1", "\\1"], $attribute_content);
+
+
+        if (in_array($attribute_content, $unique))
+          $full = ""; //clean entire tag from HTML
+        else
+          array_push($unique, $attribute_content);
+
+        var_dump($unique);
+
+        return $full;
+      }, $html);
+
+      unset($unique); //we don't compare cross-tag's content (theoretically we can have meta's content same as link's href).
+    }
 
     return $html;
   }

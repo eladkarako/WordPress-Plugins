@@ -21,6 +21,7 @@
     $html = protect_specific_tags_from_modifications($html);  //    protect pre-tags and code-tags original content.
 
     //-------------------------------------------------------------------------------------------------------------
+    $html = unify_duplicated_tags($html);  //               saves about 1%
     $html = minify_all_inner_css_in_style_tags($html);  //               saves about 2%
     $html = minify_all_inner_javascript_in_script_tags($html);  //       saves about 4%
     $html = remove_type_text_javascript_in_script_tags($html);  //       saves about 4%
@@ -34,6 +35,7 @@
     /*******************************
      * add more modifiers here...  *
      *******************************/
+
     //-------------------------------------------------------------------------------------------------------------
 
     $html = unprotect_pre_and_code_tags_content_from_change($html);  //  unprotect (bring back) pre-tags and code-tags original content.
