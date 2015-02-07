@@ -16,7 +16,7 @@
   require_once('lib/modifiers.php');
 
   hook_html(function ($html) {
-    $html = get_mock_html();
+//    $html = get_mock_html();
 
     $html_before = $html . '';
 
