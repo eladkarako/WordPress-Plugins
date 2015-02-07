@@ -60,7 +60,7 @@
   function put_all_link_css_at_end_of_head($html) {
     $elements = [];
 
-    $html = preg_replace_callback("#(<link[^\>]*?rel=[\',\"]?stylesheet[\',\"]?[^\>]*?>|<style[^\>]*?type=[\',\"]?text\/css[\',\"]?[^\>]*?>[^\<]*?<\/style>)#is", function ($arr) use (&$elements) {
+    $html = preg_replace_callback("#(<link[^\>]*?rel=[\',\"]?stylesheet[\',\"]?[^\>]*?>|<style[^\>]*>[^\<]*?</style>)#is", function ($arr) use (&$elements) {
       $full = $arr[0];
 
       array_push($elements, $full); //    store content.
@@ -99,25 +99,43 @@
    * @return string
    */
   function collapse_white_space_between_tags($html) {
-    //#1
-    //   - most cases where presentation does not suffer, when whitespace collapsing
+    //#1 - whitespace collapsing
     $replacements = [
-      "/>\n+</s"   => "><" //separation by new line can be omitted
-      , "/>\s+</s" => "> <"//separation by whitespace can not be omitted since it will change the line-breaks shown on the page.
+      "#>\n+<#sm"   => "><" //separation by new line can be omitted
+      , "#>\s+<#sm" => "> <"//separation by whitespace can not be omitted since it will change the line-breaks shown on the page.
     ];
 
-    //#2
-    //   - cases where its ok to remove the whitespace anyway (specific tags)
-    $tags = ['li', 'script', 'iframe', 'div', 'title', 'br', 'pre', 'center', 'meta', '!--' /*--- this is for a comment tag meaning: "<!--" */];
+    //#2 - whitespace removing - safe to remove on non-standard ending tags
+    $replacements['#\s*<!--#smi'] = '<!--';
+    $replacements['#-->\s*#smi'] = '-->';
+    $replacements['#\s*\<br\s*\/{0,1}\>\s*#smi'] = '<br>';
+    $replacements['#\s*\<hr\s*\/{0,1}\>\s*#smi'] = '<hr>';
+
+    //#2 - whitespace removing - safe to remove on standard ending tags
+    $tags = ['tr', 'li', 'script', 'iframe', 'div', 'title', 'pre'];
     foreach ($tags as $tag) {
-//      $replacements[ '#\s*\/' . $tag . '\>[^\<]*\<' . $tag . '#s' ] = '/' . $tag . '><' . $tag;
-//      $replacements[ '#\s*\</' . $tag . '\>#s' ] = '</' . $tag . '>';
-//      $replacements[ '#\>\s*\<' . $tag . '#s' ] = '><' . $tag;
+      $replacements[ "#\s*\<" . $tag . "#i" ] = "<" . $tag;     //whitespace before the opening tag
+      $replacements[ "#</" . $tag . ">\s*#i" ] = "</" . $tag . ">";     //whitespace after the ending tag
     }
 
     $html = preg_replace(array_keys($replacements), array_values($replacements), $html);
 
     return $html;
+  }
+
+
+  /**
+   * removes the whitespace at start and end of the HTML
+   *
+   * @param string $html
+   *
+   * @return string
+   */
+  function remove_white_space_around_edges($html) {
+    $html = trim($html);
+
+    return $html;
+
   }
 
 
@@ -136,27 +154,12 @@
 
 
   /**
-   * remove \n after <br>
-   *
-   * @param string $html
-   *
-   * @return string
-   */
-  function remove_line_feed_after_br_tag_and_hr_tag($html) {
-    $html = preg_replace("/<br\s*\/?>\n+/smi", "<br>", $html);
-    $html = preg_replace("/<hr\s*\/?>\n+/smi", "<hr>", $html);
-
-    return $html;
-  }
-
-  /**
    * @param $html
    *
    * @return string
    */
   function minify_all_inner_css_in_style_tags($html) {
-
-    $html = preg_replace_callback("/(<style[^\>]*?type=[\',\"]?text\/css[\',\"]?[^\>]*?\>)([^\<]*?)\<\/style\>/msi", function ($arr) {
+    $html = preg_replace_callback("#(<style[^\>]*>)([^\<]*?)</style>#msi", function ($arr) {
       if (!array_key_exists(0, $arr) || !array_key_exists(1, $arr) || !array_key_exists(2, $arr)) //not found
         return "";
 
@@ -179,6 +182,7 @@
    * @return string
    */
   function minify_all_inner_javascript_in_script_tags($html) {
+    //classic type="text/javascript"
     $html = preg_replace_callback("/(<script[^\>]*?type=[\',\"]?text\/javascript[\',\"]?[^\>]*?\>)([^\<]*?)\<\/script\>/msi", function ($arr) {
       if (!array_key_exists(0, $arr) || !array_key_exists(1, $arr) || !array_key_exists(2, $arr)) //not found
         return "";
@@ -192,18 +196,17 @@
       return $tag_start . $inline . '</script>'; //reassemble
     }, $html);
 
-    return $html;
-  }
+    //implicit HTML5 script tags with no type (there are other kinds which will not be handled)
+    //there is a non-greedy condition since we want to avoid skipping a script due to CDATA text inside (looks like closing script-tag..)
+    $html = preg_replace_callback("#\<script\s*\>(.*?)\<\/script\>#msi", function ($arr) {
+      $full = $arr[0];
+      $inline = $arr[1];
 
-  /**
-   * script tags types "text/javascript", can be omitted
-   *
-   * @param string $html
-   *
-   * @return string
-   */
-  function remove_type_text_javascript_in_script_tags($html) {
-    $html = preg_replace("#type\=[\',\"]?text\/javascript[\',\"]?#msi", '', $html);
+      $inline = minify_javascript($inline); //minify
+
+      return '<script>' . $inline . '</script>'; //reassemble
+    }, $html);
+
 
     return $html;
   }
